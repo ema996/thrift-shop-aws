@@ -1,0 +1,19 @@
+{
+  "name": "thrift_shop_aws",
+  "version": "1.0.0",
+  "description": "",
+  "main": "database-helper.js",
+  "dependencies": {
+    "dotenv": "^6.0.0",
+    "nodejs-base64-encode": "^0.0.2",
+    "http-errors": "^1.7.0",
+    "pg": "^7.4.3",
+    "randomstring": "^1.1.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

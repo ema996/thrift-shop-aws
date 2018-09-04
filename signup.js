@@ -28,27 +28,27 @@ async function signup(event) {
     var balance = event.body.balance;
 
     if(!first_name) {
-        var err = createError(404, 'Please enter your first_name');
+        var err = createError(400, 'Please enter your first_name');
         throw err;
     }
 
     if(!last_name) {
-        var err = createError(404, 'Please enter your last_name');
+        var err = createError(400, 'Please enter your last_name');
         throw err;
     }
 
     if(!username) {
-        var err = createError(404, 'Please enter your username');
+        var err = createError(400, 'Please enter your username');
         throw err;
     }
 
     if(!pass) {
-        var err = createError(404, 'Please enter your pass');
+        var err = createError(400, 'Please enter your pass');
         throw err;
     }
 
     if(!balance) {
-        var err = createError(404, 'Please enter your balance');
+        var err = createError(400, 'Please enter your balance');
         throw err;
     }
 
@@ -64,7 +64,7 @@ async function signup(event) {
     var token = generateToken.generateToken ();
     var result = await client.query(queryBuilder.createUser(), [first_name, last_name, username,hash, balance,token]);
     
-    return result;
+    return result.rows[0];
 
 }
 

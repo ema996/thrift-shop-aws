@@ -39,9 +39,9 @@ function getProductsByUserId(){
 
 
 function checkingPriceAndOwnerId(){
-return `SELECT price, user_id 
+return `SELECT price, user_id,available
         FROM T_PRODUCT
-        WHERE product_id = $1 AND available=true`
+        WHERE product_id = $1`
 }
 
 function checkBalance() {
@@ -89,7 +89,8 @@ function setNewPassword() {
     return `
         UPDATE T_USER 
         SET pass = $1 
-        WHERE user_id = $2;
+        WHERE user_id = $2
+        returning *;
   `
 }
 

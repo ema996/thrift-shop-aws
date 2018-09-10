@@ -56,7 +56,7 @@ async function signup(event) {
     var checkUser = await client.query(queryBuilder.checkIfUserExist(),[username]);
     console.log(checkUser);
     if(checkUser.rowCount > 0) {   
-        var err = createError(404, 'User already exist.');
+        var err = createError(409, 'User already exist.');
         throw err;
     }
 

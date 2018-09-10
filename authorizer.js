@@ -76,7 +76,7 @@ function buildPolicy(user, event) {
         policy.allowAllMethods();
         let authResponse = policy.build();
         authResponse.context = {
-            userId: user.profile_id
+            userId: user.user_id
         };
 
         console.log('Policy is: ', JSON.stringify(authResponse, null, 2));

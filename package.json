@@ -5,10 +5,14 @@
   "main": "database-helper.js",
   "dependencies": {
     "dotenv": "^6.0.0",
-    "nodejs-base64-encode": "^0.0.2",
+    "file-type": "^9.0.0",
     "http-errors": "^1.7.0",
+    "moment": "^2.22.2",
+    "nodejs-base64-encode": "^0.0.2",
+    "parse-multipart": "^1.0.4",
     "pg": "^7.4.3",
-    "randomstring": "^1.1.5"
+    "randomstring": "^1.1.5",
+    "sha1": "^1.1.1"
   },
   "devDependencies": {},
   "scripts": {

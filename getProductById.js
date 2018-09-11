@@ -3,7 +3,7 @@ const createError = require('http-errors');
 const queryBuilder = require ('./queryBuilder.js');
 const crypto = require('crypto');
 const generateToken = require('./token.js');
-const db = require('./database-helper.js')
+const db = require('./db.js')
 
 
 exports.handler = async (event,context,callback) => {
@@ -17,17 +17,14 @@ exports.handler = async (event,context,callback) => {
             message: err.message || "Internal server error."
         }
         callback(JSON.stringify(error));
-    }
+    } 
 }
 
 async function getProductsByProductId(event){
-    console.log('Ova e eventot: ',event);
-    const client = await db.pool.connect();
+    console.log('Ova e eventot: ',event)
     var product_id = event.params.path.id;
-    
-  
     console.log('Stigna do product_id i ova e product id: ',product_id);
-    var result = await client.query(queryBuilder.getProductById(),[product_id]);
+    var result = await db.query(queryBuilder.getProductById(),[product_id]);
     console.log('Ova e rezultat od query-to: ',result);
     
     if(result.rowCount==0){

@@ -3,7 +3,7 @@ const createError = require('http-errors');
 const queryBuilder = require ('./queryBuilder.js');
 const crypto = require('crypto');
 const generateToken = require('./token');
-const db = require('./database-helper.js')
+const db = require('./db.js')
 
 exports.handler = async (event,context,callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
@@ -16,11 +16,10 @@ exports.handler = async (event,context,callback) => {
             message: err.message || "Internal server error."
         }
         callback(JSON.stringify(error));
-    }
+    } 
 }
 
 async function loginFunc (event) {
-    const client = await db.pool.connect();
     var username = event.body.username;
     var pass = event.body.pass;
 
@@ -35,7 +34,7 @@ async function loginFunc (event) {
     }
 
         var hash = crypto.createHash('sha256').update(pass).digest('base64');
-        var checkUsernameAndPass = await client.query(queryBuilder.checkUsernameAndPass(),[username,hash]);
+        var checkUsernameAndPass = await db.query(queryBuilder.checkUsernameAndPass(),[username,hash]);
 
         if(checkUsernameAndPass.rowCount == 0) {
             var err = createError(401, 'Unauthorized');

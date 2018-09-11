@@ -3,8 +3,11 @@ const createError = require('http-errors');
 const queryBuilder = require ('./queryBuilder.js');
 const crypto = require('crypto');
 const generateToken = require('./token');
-const db = require('./database-helper.js');
+const db = require('./db.js');
 const multipart = require('parse-multipart');
+const AWS = require('aws-sdk');
+var s3 = new AWS.S3({region: "eu-central-1"});
+
 
 exports.handler = async(event,context,callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
@@ -17,16 +20,11 @@ exports.handler = async(event,context,callback) => {
             message: err.message || "Internal server error."
         }
         callback(JSON.stringify(error));
-    }
+    } 
 }
 
 async function createProduct(event) {
     console.log(event);
-    
-    
-    const client = await db.pool.connect();
-    var imageUrl = event.body.imageUrl;
-    console.log('Linkot od slikata: ',imageUrl);
     var product_name = event.body.product_name;
     console.log('Imeto na produktot: ',product_name)
     var price = event.body.price;
@@ -37,6 +35,9 @@ async function createProduct(event) {
     var user_id = event.context.userId;
     console.log('Id-to na user-ot e: ',user_id);
 
+    
+   
+    
     if(!product_name) {
         var err=createError(400,'Please enter a product name');
         throw err;
@@ -52,82 +53,54 @@ async function createProduct(event) {
         throw err;
     }
 
-    if(!imageUrl){
-        var err=createError(400,'Please upload a file');
-        throw err;
-    }
 
-    var queryResult = await client.query(queryBuilder.createProduct(),[product_name, price, category, imageUrl, description, user_id]);
-    console.log('Rezultatot od query-to e: ',queryResult);
-    return queryResult.rows;
+   
+   function formatDate(date) {
+  var monthNames = [
+    "January", "February", "March",
+    "April", "May", "June", "July",
+    "August", "September", "October",
+    "November", "December"
+  ];
+
+  var day = date.getDate();
+  var monthIndex = date.getMonth();
+  var year = date.getFullYear();
+  var min = date.getMinutes();
+  var sec=date.getSeconds();
+  var hours = date.getHours();
+
+  return day + '_' + monthNames[monthIndex] + '_' + year+'_'+hours+'_'+min+'_'+sec;
 }
 
-// 'use strict'
+var dateNow = formatDate(new Date());  
+   
+   
+    const signedUrlExpireSeconds = 60 * 100;
+    var keyName = user_id+'/'+'image_'+dateNow+'.jpg';
+    var filePath = 'https://s3.eu-central-1.amazonaws.com/products.images/'+ keyName;
+    
+    var params = {Bucket: "products.images", Key: keyName};
+    var url = await getSignedUrlAsync(params);
+    console.log('Ova e url-to: ',url);
+    var queryResult = await db.query(queryBuilder.createProduct(),[product_name, price, category, filePath, description, user_id]);
+    console.log('Rezultatot od query-to e: ',queryResult);
+    return {"queryResult: ":queryResult.rows[0],
+            "url": url
+    };
+}
 
-// const AWS = require('aws-sdk');
-// const s3 = new AWS.S3();
-// const moment = require ('moment');
-// const fileType = require('file-type');
-
-// require ('dotenv').config();
-// const createError = require('http-errors');
-// const queryBuilder = require ('./queryBuilder.js');
-// const crypto = require('crypto');
-// const generateToken = require('./token');
-// const db = require('./database-helper.js');
-// const multipart = require('parse-multipart');
-
-// exports.handler = async (event,context,callback) => {
-//     var request = event['body-json'].image;
-//     var base64String = request.base64String;
-//     var buffer = new Buffer(base64String, 'base64');
-//     var fileMime = fileType(buffer);
-
-//     if(fileMime === null) {
-//         return context.fail('The string supplied is not a file type');
-//     }
-
-//     var file = getFile(fileMime, buffer);
-//     var params = file.params;
-
-//     s3.putObject(params, function(err,data) {
-//         if(err){
-//             return console.log(err);
-//         }
-
-//         return console.log('File URL', file.full_path);
-//     })
-
-
-//     var getFile = function(fileMime,buffer) {
-//         var fileExt = fileMime.ext;
-//         var hash = sha1(new Buffer(new Date().toString()));
-//         var now= moment().format('YYYY-MM-DD HH:mm:ss');
-
-//         var filePath = hash + '/';
-//         var fileName = unixTime(now) + '.'+fileExt;
-//         var fileFullName = filePath +fileName;
-//         var fileFullPath = 'Your bucket path'+fileFullName;
-
-//         var params ={
-//             Bucket: 'products.images',
-//             Key: 'thisIsKey',
-//             Body: buffer
-//         };
-
-//         var uploadFile = {
-//             size: buffer.toString('ascii').length,
-//             type: fileMime.mime,
-//             name: fileName,
-//             full_path: fileFullPath
-//         }
-
-//         return {
-//             'params' : params,
-//             'uploadFile' : uploadFile
-//         }
-//     }
-// }
-
+async function getSignedUrlAsync(params){
+    return new Promise(function(resolve,reject){
+        s3.getSignedUrl('putObject',params, function(err,data) {
+            if(err){
+                console.log('Error uploading data', err);
+                reject(err);
+            } else{
+                resolve(data);
+            }
+        });
+    });
+}
 
 

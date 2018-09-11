@@ -3,7 +3,7 @@ var createError = require('http-errors');
 const queryBuilder = require ('./queryBuilder.js');
 const crypto = require('crypto');
 const generateToken = require('./token.js');
-const db = require('./database-helper');
+const db = require('./db');
 
 exports.handler = async (event,context,callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
@@ -16,11 +16,10 @@ exports.handler = async (event,context,callback) => {
             message: err.message || "Internal server error."
         }
         callback(JSON.stringify(error));
-    }
+    } 
 }
 
 async function signup(event) {
-    const client = await db.pool.connect();
     var first_name = event.body.first_name;
     var last_name = event.body.last_name;
     var username = event.body.username;
@@ -53,7 +52,7 @@ async function signup(event) {
     }
 
     console.log("Nekoj tekst");
-    var checkUser = await client.query(queryBuilder.checkIfUserExist(),[username]);
+    var checkUser = await db.query(queryBuilder.checkIfUserExist(),[username]);
     console.log(checkUser);
     if(checkUser.rowCount > 0) {   
         var err = createError(409, 'User already exist.');
@@ -62,7 +61,7 @@ async function signup(event) {
 
     var hash = crypto.createHash('sha256').update(pass).digest('base64');
     var token = generateToken.generateToken ();
-    var result = await client.query(queryBuilder.createUser(), [first_name, last_name, username,hash, balance,token]);
+    var result = await db.query(queryBuilder.createUser(), [first_name, last_name, username,hash, balance,token]);
     
     return result.rows[0];
 

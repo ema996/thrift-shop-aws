@@ -3,10 +3,9 @@ const createError = require('http-errors');
 const queryBuilder = require ('./queryBuilder.js');
 const crypto = require('crypto');
 const generateToken = require('./token.js');
-const db = require('./database-helper.js');
+const db = require('./db.js');
 
 exports.handler = async(event,context,callback) => {
-    console.log('Ova e eventot kaj handler-ot: ', event);
     context.callbackWaitsForEmptyEventLoop = false;
     try{
         var data = await createOrder(event);
@@ -17,12 +16,11 @@ exports.handler = async(event,context,callback) => {
             message: err.message || "Internal server error."
         }
         callback(JSON.stringify(error));
-    }
+    } 
 }
 
 async function createOrder (event) {
     console.log('Ova e eventot: ',event);
-    const client = await db.pool.connect();
     var product_id = event.body.product_id;
     console.log('Ova e id-to na produktot: ',product_id);
     var user_id= event.context.userId;
@@ -33,10 +31,10 @@ async function createOrder (event) {
         throw err;
     }
 
-    var balanceQuery= await client.query(queryBuilder.checkBalance(),[user_id]);
+    var balanceQuery= await db.query(queryBuilder.checkBalance(),[user_id]);
     var balance=balanceQuery.rows[0].balance;
     console.log('Userot ima tolku pari: ',balance);
-    var priceAndOwnerIdQuery = await client.query(queryBuilder.checkingPriceAndOwnerId(), [product_id]);
+    var priceAndOwnerIdQuery = await db.query(queryBuilder.checkingPriceAndOwnerId(), [product_id]);
     console.log('Ova e priceAndOwnerIdQuery :  ',priceAndOwnerIdQuery);
 
     if(priceAndOwnerIdQuery.rowCount ==0){
@@ -56,7 +54,7 @@ async function createOrder (event) {
         var err = createError(409,'You can not buy your own product');
         throw err;
     }
-    var orderQuery = await client.query(queryBuilder.createOrder(),[price,user_id,ownerId,product_id]);
+    var orderQuery = await db.query(queryBuilder.createOrder(),[price,user_id,ownerId,product_id]);
     console.log('Rezultatot od poslednoto query(transakcijata): ',orderQuery);
 
     return orderQuery.rows;

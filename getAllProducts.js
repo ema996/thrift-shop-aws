@@ -3,13 +3,12 @@ const createError = require('http-errors');
 const queryBuilder = require ('./queryBuilder.js');
 const crypto = require('crypto');
 const generateToken = require('./token.js');
-const db = require('./database-helper.js')
+const db = require('./db.js')
 
 exports.handler = async (event,context,callback) => {
-    const client = await db.pool.connect();
     context.callbackWaitsForEmptyEventLoop = false;
     try {
-        var data = await getProducts(event,client);
+        var data = await getProducts(event);
         callback(null,data)
     } catch (err) { 
         const error = {
@@ -17,14 +16,12 @@ exports.handler = async (event,context,callback) => {
             message: err.message || "Internal server error."
         }
         callback(JSON.stringify(error));
-    } finally {
-        client.release();
-    }
+    } 
 }
 
 
-async function getProducts (event,client) {
-    var result = await client.query(queryBuilder.getProducts());
+async function getProducts (event) {
+    var result = await db.query(queryBuilder.getProducts());
 
     if(!result) {
         var err = createError(500,'There is an error');

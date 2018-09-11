@@ -1,7 +1,7 @@
 'use strict';
 
 require('dotenv').config();
-const db = require('./database-helper.js');
+const db = require('./db.js');
 const queryBuilder = require ('./queryBuilder.js');
 
 exports.handler = (event, context, callback) => {
@@ -35,9 +35,9 @@ function authenticate(token) {
 }
 
 async function getUserByAccessToken(accessToken){
-    return db.pool.connect().then(client => {
-      return client.query(queryBuilder.findUserByToken(),[accessToken]);
-  }).then(response => {
+    
+      return db.query(queryBuilder.findUserByToken(),[accessToken])
+  .then(response => {
     console.log(response);
         if(response && response.rowCount > 0){
             return response.rows[0];

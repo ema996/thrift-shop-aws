@@ -3,13 +3,12 @@ const createError=require('http-errors');
 const queryBuilder=require('./queryBuilder.js');
 const crypto=require('crypto');
 const generateToken=require('./token.js');
-const db=require('./database-helper.js');
+const db=require('./db.js');
 
 exports.handler = async (event,context,callback) => {
-    const client = await db.pool.connect();
     context.callbackWaitsForEmptyEventLoop = false;
     try {
-        var data = await getAllOrders(event,client);
+        var data = await getAllOrders(event);
         callback(null,data)
     } catch (err) { 
         const error = {
@@ -17,14 +16,12 @@ exports.handler = async (event,context,callback) => {
             message: err.message || "Internal server error."
         }
         callback(JSON.stringify(error));
-    } finally{
-        client.release();
-    }
+    } 
 }
 
-async function getAllOrders (event,client) {
+async function getAllOrders (event) {
     var user_id = event.context.userId;
-    var queryResult = await client.query(queryBuilder.getOrders(),[user_id]);
+    var queryResult = await db.query(queryBuilder.getOrders(),[user_id]);
     return queryResult.rows;
     
 }

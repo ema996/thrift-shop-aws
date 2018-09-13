@@ -7,36 +7,7 @@
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
-  <script>
-      $(document).ready(function(){
-      $("#submitId").click(function(){
-        $.ajax({
-            url: "https://gd40kn044b.execute-api.us-east-2.amazonaws.com/testing/product/new-product",
-            type: "POST",
-            crossDomain: true,
-            data: JSON.stringify({
-                                    product_name: $("#productNameId").val(),
-                                    price: $("#priceId").val(),
-                                    category : $("#categoryId").val(),
-                                    description : $("#descriptionId").val()
-                                }),
-            headers: {
-              "accept": "application/json",
-              "Access-Control-Allow-Origin":"*",
-              "Content-Type": "application/json",
-              "authorizationToken": "dW5kZWZpbmVkfHlveDFCV2E0VnF8MTUzNjA3MzI3MTM4NHxKQXJOdC9aaVpoZlRWcFB4U29PVStUbHJUM2FGWXlaRUR2cWV5WUF5aHVZPQ=="
-          },
-            success: function (response) {
-                console.log(response);
-            },
-            error: function (xhr, status) {
-                alert("error");
-            }
-        })
-      })
-      });
-      
-        </script>
+  <script src = "ajax.js"></script>
 
 </head>
 <body>

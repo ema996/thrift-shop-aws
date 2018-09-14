@@ -32,7 +32,9 @@
       }, 3000);
 
       $("#submitId").click(function(){
-
+        if (!$("#formId").valid()) {
+          return;
+        }
         $.ajax({
           url: "https://gd40kn044b.execute-api.us-east-2.amazonaws.com/testing/product/new-product",
           type: "POST",
@@ -61,5 +63,25 @@
           }
       })
     })
+
+    $("#formId").validate({ 
+      errorClass: 'errors',
+      rules: {
+       category: "required",
+       productName: "required",
+       price:  "required",
+       uploadImg: "required"
+      },
+
+      messages: {
+       category: "Please enter a category.",
+       productName: "Please enter product name.", 
+       price:  "Please enter price.",
+       uploadImg: "Please insert an image."
+        }
+    })
+      
+
+    
   })
   

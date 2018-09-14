@@ -8,6 +8,8 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
   <script src = "ajax.js"></script>
+  <link rel="stylesheet" href="style.css">
+  <script src = "https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.17.0/jquery.validate.min.js"></script>
 
 </head>
 <body>
@@ -15,26 +17,26 @@
    <br>
   <h2>Add product</h2>
   <p>Please fill all the fields with relevant information.</p>
-  <form action="/action_page.php">
+  <form id="formId">
     <div class="form-group">
       <label>Category</label>
-      <input type="text" class="form-control" id="categoryId" name="category">
+      <input type="text" class="form-control" id="categoryId" name="category" required>
     </div>
     <div class="form-group">
       <label>Product Name</label>
-      <input type="text" class="form-control" id="productNameId" name="productName">
+      <input type="text" class="form-control" id="productNameId" name="productName" required>
     </div>
      <div class="form-group">
       <label>Price</label>
-      <input type="text" class="form-control" id="priceId" name="price">
+      <input type="text" class="form-control" id="priceId" name="price" required>
     </div>
      <div class="form-group">
-      <label>Description</label>
+      <label>Description (optional)</label>
       <textarea class="form-control" rows="5" id="descriptionId"></textarea>
     </div>
     <form action="upload" method="post" enctype="multipart/form-data">
-            <label for="file_photo">Photo   </label>
-            <input type="file" name="file_photo" id="file_photo" multiple accept="image/gif, image/jpeg"><br>
+            <label for="file_photo" name="upload">Photo   </label>
+            <input type="file" name="uploadImg" id="file_photo" multiple accept="image/gif, image/jpeg" required><br>
             <div> 
 
 		</div>
@@ -42,6 +44,7 @@
         <br>
     <button type="submit" class="btn btn-primary" id="submitId" style="margin-top: 50px;">Submit</button>
   </form>
+  
 </div>
 
 </body>
